@@ -2818,7 +2818,7 @@
       "visualType": "timechart",
       "pageId": "5838c918-4541-44fe-90d2-77306ef1e241",
       "layout": { "x": 11, "y": 42, "width": 11, "height": 7 },
-      "queryRef": { "kind": "query", "queryId": "236c8e10-9465-4777-8377-170d9bc8904" },
+      "queryRef": { "kind": "query", "queryId": "f3a149ad-b707-4e43-a216-3c73d514a632" },
       "visualOptions": {
         "hideLegend": false,
         "legendLocation": "bottom",
@@ -4034,7 +4034,7 @@
     {
       "dataSource": { "kind": "inline", "dataSourceId": "23540be2-ffc9-4b61-8c4c-05e493e682a6" },
       "text": "let topResources = ResourceAnomalies\n    | summarize arg_max(ChangeAmount, *) by ResourceId\n    | order by ChangeAmount desc\n    | limit maxGroupCount\n    | project ResourceId;\nCostsByDay\n| where ChargeCategory == 'Usage'\n| where ResourceId in (topResources)\n| summarize\n    EffectiveCost = round(sum(EffectiveCost), 2),\n    ResourceName = take_any(ResourceName),\n    ResourceType = take_any(ResourceType)\n    by ResourceId, ChargePeriodStart = startofday(ChargePeriodStart)\n| extend Resource = iff(isempty(ResourceName), ResourceId, strcat(ResourceName, ' (', ResourceType, ')'))\n| order by ChargePeriodStart asc\n| project ChargePeriodStart, EffectiveCost, Resource",
-      "id": "236c8e10-9465-4777-8377-170d9bc8904",
+      "id": "f3a149ad-b707-4e43-a216-3c73d514a632",
       "usedVariables": ["ResourceAnomalies", "CostsByDay", "maxGroupCount"]
     },
     {
@@ -4044,4 +4044,3 @@
       "usedVariables": ["ResourceAnomalies"]
     }]
 }
-
