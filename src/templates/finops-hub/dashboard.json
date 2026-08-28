@@ -2784,6 +2784,76 @@
       }
     },
     {
+      "id": "3fd11f80-8766-4c20-8d26-94ce73776842",
+      "title": "",
+      "visualType": "markdownCard",
+      "pageId": "5838c918-4541-44fe-90d2-77306ef1e241",
+      "layout": { "x": 0, "y": 40, "width": 22, "height": 2 },
+      "markdownText": "## Resource anomaly drivers\r\nResources with the largest day-over-day usage cost increase. Only usage rows with a resource ID are included, and daily costs below 10 are ignored to reduce noise.\r\n\r\n⬆️ [Top](?tile=08c92e20-6563-464b-893f-81d80dd3caa1) &nbsp; &nbsp; 💜 [Give feedback](https://portal.azure.com/#view/HubsExtension/InProductFeedbackBlade/extensionName/FinOpsToolkit/cesQuestion/How%20easy%20or%20hard%20is%20it%20to%20use%20the%20FinOps%20hubs%20Data%20Explorer%20dashboard%3F/cvaQuestion/How%20valuable%20the%20FinOps%20hubs%20Data%20Explorer%20dashboard%3F/surveyId/FTK$$ftkver$$/bladeName/Hubs.Dashboard/featureName/Understand.Anomalies.Resources)",
+      "visualOptions": {}
+    },
+    {
+      "id": "4d736ac8-170f-4a25-bdd8-7e57b3dc79f0",
+      "title": "Top resource cost increases",
+      "visualType": "column",
+      "pageId": "5838c918-4541-44fe-90d2-77306ef1e241",
+      "layout": { "x": 0, "y": 42, "width": 11, "height": 7 },
+      "queryRef": { "kind": "query", "queryId": "f28be25b-6f5b-4e6e-9ecb-664727a2fc1b" },
+      "visualOptions": {
+        "yAxisMinimumValue": 0,
+        "yColumnTitle": "Cost increase",
+        "xColumnTitle": "",
+        "xColumn": "Resource",
+        "yColumns": ["Cost increase"],
+        "crossFilterDisabled": false,
+        "drillthroughDisabled": false,
+        "crossFilter": [],
+        "drillthrough": [],
+        "colorRules": []
+      }
+    },
+    {
+      "id": "9914fa2e-2933-4448-b618-ed893b516be9",
+      "title": "Daily trend for top anomalous resources",
+      "visualType": "timechart",
+      "pageId": "5838c918-4541-44fe-90d2-77306ef1e241",
+      "layout": { "x": 11, "y": 42, "width": 11, "height": 7 },
+      "queryRef": { "kind": "query", "queryId": "236c8e10-9465-4777-8377-170d9bc8904" },
+      "visualOptions": {
+        "hideLegend": false,
+        "legendLocation": "bottom",
+        "xColumnTitle": "",
+        "xColumn": "ChargePeriodStart",
+        "yColumns": ["EffectiveCost"],
+        "seriesColumns": ["Resource"],
+        "xAxisScale": "linear",
+        "crossFilterDisabled": false,
+        "drillthroughDisabled": false,
+        "crossFilter": [],
+        "drillthrough": [],
+        "selectedDataOnLoad": { "all": true, "limit": 10 },
+        "dataPointsTooltip": { "all": false, "limit": 1 }
+      }
+    },
+    {
+      "id": "7fedfe14-b828-4132-b850-b44b2422f38d",
+      "title": "Resource anomaly details",
+      "visualType": "table",
+      "pageId": "5838c918-4541-44fe-90d2-77306ef1e241",
+      "layout": { "x": 0, "y": 49, "width": 22, "height": 8 },
+      "queryRef": { "kind": "query", "queryId": "5d4d60d3-3f44-4643-86db-d29a07c5285c" },
+      "visualOptions": {
+        "table__enableRenderLinks": true,
+        "colorRulesDisabled": true,
+        "crossFilterDisabled": false,
+        "drillthroughDisabled": false,
+        "crossFilter": [],
+        "drillthrough": [],
+        "table__renderLinks": [],
+        "colorRules": []
+      }
+    },
+    {
       "id": "961b8980-213f-4bc7-9512-8a08614229e0",
       "title": "Effective Savings Rate (last n months)",
       "visualType": "multistat",
@@ -3248,7 +3318,8 @@
     { "id": "4880346a-0a24-48f9-bf25-b7427df29d69", "queryId": "6b598467-8c31-4693-b1eb-7ed683fcfc3a", "variableName": "CostsByDay" },
     { "id": "8ca40660-3fbc-4a08-b12e-92e7382d9449", "queryId": "4a1973bf-08e9-4e82-b8e6-6edff81cf0a5", "variableName": "CostsByDayAHB" },
     { "id": "48ebd897-d085-490f-8b4b-9b43d4fb2efc", "queryId": "eb9259cc-05b7-4441-a66d-a29026fe371b", "variableName": "CostsPlus" },
-    { "id": "d4461bd4-a159-4478-9caa-2f2581ddcf95", "queryId": "ede6c9ce-4b33-4c2e-b572-07e3361b242e", "variableName": "CostRecommendations" }
+    { "id": "d4461bd4-a159-4478-9caa-2f2581ddcf95", "queryId": "ede6c9ce-4b33-4c2e-b572-07e3361b242e", "variableName": "CostRecommendations" },
+    { "id": "8c8c31f5-2c2d-4a35-a27a-c264ac3d1c25", "queryId": "34f863cf-687f-462f-a052-1689869afec8", "variableName": "ResourceAnomalies" }
   ],
   "parameters": [
     {
@@ -3947,5 +4018,29 @@
       "usedVariables": [
         "CostsByDay"
       ]
+    },
+    {
+      "dataSource": { "kind": "inline", "dataSourceId": "23540be2-ffc9-4b61-8c4c-05e493e682a6" },
+      "text": "let minimumDailyCost = 10.0;\nlet dailyCosts = materialize(\n    CostsByDay\n    | where ChargeCategory == 'Usage'\n    | where isnotempty(ResourceId)\n    | summarize\n        EffectiveCost = round(sum(EffectiveCost), 2),\n        ResourceName = take_any(ResourceName),\n        ResourceType = take_any(ResourceType),\n        ResourceGroup = take_any(x_ResourceGroupName),\n        SubscriptionId = take_any(SubAccountId),\n        SubscriptionName = take_any(SubAccountName)\n        by ResourceId, ChargePeriodStart = startofday(ChargePeriodStart)\n);\nlet previousDayCosts = dailyCosts\n    | project ResourceId, PreviousDate = ChargePeriodStart + 1d, PreviousEffectiveCost = EffectiveCost;\ndailyCosts\n| join kind=leftouter previousDayCosts on ResourceId, $left.ChargePeriodStart == $right.PreviousDate\n| extend PreviousEffectiveCost = coalesce(PreviousEffectiveCost, todouble(0))\n| extend ChangeAmount = round(EffectiveCost - PreviousEffectiveCost, 2)\n| extend ChangePercent = iff(PreviousEffectiveCost > 0, round(ChangeAmount / PreviousEffectiveCost * 100, 1), todouble(null))\n| where EffectiveCost >= minimumDailyCost or PreviousEffectiveCost >= minimumDailyCost\n| where ChangeAmount > 0\n| project ChargePeriodStart, ResourceId, ResourceName, ResourceType, ResourceGroup, SubscriptionId, SubscriptionName, EffectiveCost, PreviousEffectiveCost, ChangeAmount, ChangePercent",
+      "id": "34f863cf-687f-462f-a052-1689869afec8",
+      "usedVariables": ["CostsByDay"]
+    },
+    {
+      "dataSource": { "kind": "inline", "dataSourceId": "23540be2-ffc9-4b61-8c4c-05e493e682a6" },
+      "text": "ResourceAnomalies\n| summarize arg_max(ChangeAmount, *) by ResourceId\n| order by ChangeAmount desc\n| limit maxGroupCount\n| extend Resource = iff(isempty(ResourceName), ResourceId, strcat(ResourceName, ' (', ResourceType, ')'))\n| project Resource, ['Cost increase'] = ChangeAmount, ['Current daily cost'] = EffectiveCost, ['Previous daily cost'] = PreviousEffectiveCost, ['Change %'] = ChangePercent",
+      "id": "f28be25b-6f5b-4e6e-9ecb-664727a2fc1b",
+      "usedVariables": ["ResourceAnomalies", "maxGroupCount"]
+    },
+    {
+      "dataSource": { "kind": "inline", "dataSourceId": "23540be2-ffc9-4b61-8c4c-05e493e682a6" },
+      "text": "let topResources = ResourceAnomalies\n    | summarize arg_max(ChangeAmount, *) by ResourceId\n    | order by ChangeAmount desc\n    | limit maxGroupCount\n    | project ResourceId;\nCostsByDay\n| where ChargeCategory == 'Usage'\n| where ResourceId in (topResources)\n| summarize\n    EffectiveCost = round(sum(EffectiveCost), 2),\n    ResourceName = take_any(ResourceName),\n    ResourceType = take_any(ResourceType)\n    by ResourceId, ChargePeriodStart = startofday(ChargePeriodStart)\n| extend Resource = iff(isempty(ResourceName), ResourceId, strcat(ResourceName, ' (', ResourceType, ')'))\n| order by ChargePeriodStart asc\n| project ChargePeriodStart, EffectiveCost, Resource",
+      "id": "236c8e10-9465-4777-8377-170d9bc8904",
+      "usedVariables": ["ResourceAnomalies", "CostsByDay", "maxGroupCount"]
+    },
+    {
+      "dataSource": { "kind": "inline", "dataSourceId": "23540be2-ffc9-4b61-8c4c-05e493e682a6" },
+      "text": "ResourceAnomalies\n| summarize arg_max(ChangeAmount, *) by ResourceId\n| order by ChangeAmount desc\n| limit 100\n| project\n    Date = ChargePeriodStart,\n    Resource = ResourceName,\n    ResourceId,\n    ResourceType,\n    ResourceGroup,\n    Subscription = SubscriptionName,\n    ['Current daily cost'] = EffectiveCost,\n    ['Previous daily cost'] = PreviousEffectiveCost,\n    ['Cost increase'] = ChangeAmount,\n    ['Change %'] = ChangePercent",
+      "id": "5d4d60d3-3f44-4643-86db-d29a07c5285c",
+      "usedVariables": ["ResourceAnomalies"]
     }]
 }
