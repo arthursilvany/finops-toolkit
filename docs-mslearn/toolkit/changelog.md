@@ -3,7 +3,7 @@ title: FinOps toolkit changelog
 description: Review the latest features and enhancements in the FinOps toolkit, including updates to FinOps hubs, Power BI reports, and more.
 author: MSBrett
 ms.author: brettwil
-ms.date: 08/26/2026
+ms.date: 08/28/2026
 ms.topic: reference
 ms.service: finops
 ms.subservice: finops-toolkit
@@ -33,6 +33,7 @@ The following section lists features and enhancements that are currently in deve
   - Added optional AWS FOCUS ingestion, which copies FOCUS 1.2 cost and usage exports from an Amazon S3 bucket into the hub data lake every day so AWS costs are normalized alongside Microsoft Cloud costs. Enable it in the **Multicloud** step of the deployment wizard.
   - Added a **Usage optimization** page to the Azure Data Explorer dashboard that surfaces Azure Advisor cost recommendations and the hub's built-in recommendations, with estimated savings summarized by impact, recommendation type, resource type, and subscription, plus detail tables and a collection freshness view.
   - Added resource-level anomaly driver views to the Azure Data Explorer dashboard to identify resources with the largest day-over-day usage cost increases.
+  - Added a **Cloud provider** filter to the Azure Data Explorer dashboard so costs and recommendations can be scoped to a single cloud provider, such as Azure or AWS.
   - Added the `Add-FinOpsHubResourceGraphReader` PowerShell command to grant the Data Factory managed identity Reader access to subscriptions or management groups used by Resource Graph recommendations.
   - Added deployment helper scripts and status output for the post-deployment Billing Reader and Resource Graph Reader access commands.
 - **Changed**
