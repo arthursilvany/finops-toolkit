@@ -88,6 +88,7 @@ function Add-FinOpsHubBillingReader
     {
         throw ($script:LocalizedData.HubBillingReader_Add_IdentityNotFound -f $dataFactories[0].Name)
     }
+    $dataFactoryName = $dataFactories[0].Name
 
     $apiVersion = '2024-04-01'
     $billingAccountUri = "providers/Microsoft.Billing/billingAccounts/$accountId"
@@ -122,14 +123,38 @@ function Add-FinOpsHubBillingReader
         | Select-Object -First 1
         if ($existing)
         {
-            Write-Verbose ($script:LocalizedData.HubBillingReader_Add_AlreadyAssigned -f $accountId)
-            return $existing
+            $message = $script:LocalizedData.HubBillingReader_Add_AlreadyAssigned -f $accountId
+            Write-Verbose $message
+            return [PSCustomObject]@{
+                Command          = 'Add-FinOpsHubBillingReader'
+                HubName          = $HubName
+                DataFactoryName  = $dataFactoryName
+                PrincipalId      = $principalId
+                BillingAccountId = $accountId
+                Scope            = $scope
+                Role             = 'Billing Reader'
+                Status           = 'AlreadyAssigned'
+                Message          = $message
+                RoleAssignmentId = $existing.id
+            }
         }
     }
 
     if (-not $PSCmdlet.ShouldProcess($scope, 'Grant Billing Reader'))
     {
-        return
+        $message = $script:LocalizedData.HubBillingReader_Add_Skipped -f $accountId
+        return [PSCustomObject]@{
+            Command          = 'Add-FinOpsHubBillingReader'
+            HubName          = $HubName
+            DataFactoryName  = $dataFactoryName
+            PrincipalId      = $principalId
+            BillingAccountId = $accountId
+            Scope            = $scope
+            Role             = 'Billing Reader'
+            Status           = 'Skipped'
+            Message          = $message
+            RoleAssignmentId = $null
+        }
     }
 
     $body = [PSCustomObject]@{
@@ -146,6 +171,18 @@ function Add-FinOpsHubBillingReader
         throw ($script:LocalizedData.HubBillingReader_Add_AssignFailed -f $accountId, $response.Content.error.message)
     }
 
-    Write-Verbose ($script:LocalizedData.HubBillingReader_Add_Assigned -f $accountId)
-    return $response.Content
+    $message = $script:LocalizedData.HubBillingReader_Add_Assigned -f $accountId
+    Write-Verbose $message
+    return [PSCustomObject]@{
+        Command          = 'Add-FinOpsHubBillingReader'
+        HubName          = $HubName
+        DataFactoryName  = $dataFactoryName
+        PrincipalId      = $principalId
+        BillingAccountId = $accountId
+        Scope            = $scope
+        Role             = 'Billing Reader'
+        Status           = 'Assigned'
+        Message          = $message
+        RoleAssignmentId = $response.Content.id
+    }
 }

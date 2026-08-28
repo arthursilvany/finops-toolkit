@@ -33,6 +33,7 @@ The following section lists features and enhancements that are currently in deve
   - Added optional AWS FOCUS ingestion, which copies FOCUS 1.2 cost and usage exports from an Amazon S3 bucket into the hub data lake every day so AWS costs are normalized alongside Microsoft Cloud costs. Enable it in the **Multicloud** step of the deployment wizard.
   - Added a **Usage optimization** page to the Azure Data Explorer dashboard that surfaces Azure Advisor cost recommendations and the hub's built-in recommendations, with estimated savings summarized by impact, recommendation type, resource type, and subscription, plus detail tables and a collection freshness view.
   - Added the `Add-FinOpsHubResourceGraphReader` PowerShell command to grant the Data Factory managed identity Reader access to subscriptions or management groups used by Resource Graph recommendations.
+  - Added deployment helper scripts and status output for the post-deployment Billing Reader and Resource Graph Reader access commands.
 - **Changed**
   - Replaced redundant `tolower()` comparisons in hub KQL with case-insensitive operators (`has`, `=~`, `!~`) so the engine can use the term index instead of scanning every row ([#2213](https://github.com/microsoft/finops-toolkit/issues/2213)).
   - Replaced whole-term `contains` matches with `has` across hub KQL and the query catalog (resource ID paths, licensing phrases, SKU description terms) and added a per-row operator-equivalence regression harness with unit test coverage ([#2220](https://github.com/microsoft/finops-toolkit/pull/2220)).

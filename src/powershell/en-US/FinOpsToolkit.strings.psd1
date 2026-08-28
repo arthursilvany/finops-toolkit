@@ -22,6 +22,7 @@ ConvertFrom-StringData -StringData @'
     HubBillingReader_Add_DataFactoryNotFound = Could not find a Data Factory for FinOps hub '{0}'. Confirm the hub is deployed and you are connected to the correct subscription.
     HubBillingReader_Add_IdentityNotFound = Data Factory '{0}' does not have a managed identity.
     HubBillingReader_Add_MultipleDataFactories = Found more than one Data Factory for FinOps hub '{0}'. Specify -ResourceGroupName to narrow the search.
+    HubBillingReader_Add_Skipped = Skipped granting the Billing Reader role on billing account '{0}'.
 
     HubResourceGraphReader_AlreadyAssigned = The FinOps hub managed identity already has the Reader role on scope '{0}'.
     HubResourceGraphReader_Assigned = Granted the Reader role to the FinOps hub managed identity on scope '{0}'.
@@ -30,6 +31,7 @@ ConvertFrom-StringData -StringData @'
     HubResourceGraphReader_IdentityNotFound = Data Factory '{0}' does not have a managed identity.
     HubResourceGraphReader_InvalidScope = Invalid Resource Graph scope '{0}'. Use a subscription ID, subscription resource ID, or management group resource ID.
     HubResourceGraphReader_MultipleDataFactories = Found more than one Data Factory for FinOps hub '{0}'. Specify -ResourceGroupName to narrow the search.
+    HubResourceGraphReader_Skipped = Skipped granting the Reader role on scope '{0}'.
 
     HubLocal_Initialize_AssetEmpty = Downloaded asset '{0}' from '{1}' was empty. The release may be incomplete or the URI may not point to a valid FinOps toolkit release.
     HubLocal_Initialize_DownloadFailed = Could not download asset '{0}' from '{1}'. Check the release URI and network connectivity.

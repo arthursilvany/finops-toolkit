@@ -31,9 +31,21 @@ to Azure. The command is safe to rerun because it checks for an existing assignm
 
 ```powershell
 Connect-AzAccount
+Import-Module .\src\powershell\FinOpsToolkit.psm1 -Force
+
 Add-FinOpsHubResourceGraphReader `
     -Scope '<subscription-id-or-management-group-resource-id>' `
-    -HubName '<finops-hub-name>'
+    -HubName '<finops-hub-name>' `
+    -ResourceGroupName '<resource-group-name>'
+```
+
+The command returns a status object with `Status` set to `Assigned`, `AlreadyAssigned`, or `Skipped`. You can also run the wrapper script from the repository root:
+
+```powershell
+.\docs\deploy\Add-FinOpsHubResourceGraphReader.ps1 `
+    -Scope '<subscription-id-or-management-group-resource-id>' `
+    -HubName '<finops-hub-name>' `
+    -ResourceGroupName '<resource-group-name>'
 ```
 
 Use a subscription ID to grant access to one subscription, or a management group resource ID to grant

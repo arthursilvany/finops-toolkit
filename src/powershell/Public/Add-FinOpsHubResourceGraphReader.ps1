@@ -99,14 +99,28 @@ function Add-FinOpsHubResourceGraphReader
     {
         throw ($script:LocalizedData.HubResourceGraphReader_IdentityNotFound -f $dataFactories[0].Name)
     }
+    $dataFactoryName = $dataFactories[0].Name
 
     foreach ($scopeValue in $normalizedScopes)
     {
         $existing = @(Get-AzRoleAssignment -ObjectId $principalId -RoleDefinitionName 'Reader' -Scope $scopeValue)
         if ($existing.Count -gt 0)
         {
-            Write-Verbose ($script:LocalizedData.HubResourceGraphReader_AlreadyAssigned -f $scopeValue)
-            $existing | Select-Object -First 1
+            $message = $script:LocalizedData.HubResourceGraphReader_AlreadyAssigned -f $scopeValue
+            Write-Verbose $message
+            $assignment = $existing | Select-Object -First 1
+            $assignmentId = if ($assignment.RoleAssignmentId) { $assignment.RoleAssignmentId } else { $assignment.Id }
+            [PSCustomObject]@{
+                Command          = 'Add-FinOpsHubResourceGraphReader'
+                HubName          = $HubName
+                DataFactoryName  = $dataFactoryName
+                PrincipalId      = $principalId
+                Scope            = $scopeValue
+                Role             = 'Reader'
+                Status           = 'AlreadyAssigned'
+                Message          = $message
+                RoleAssignmentId = $assignmentId
+            }
             continue
         }
 
@@ -121,8 +135,35 @@ function Add-FinOpsHubResourceGraphReader
                 throw ($script:LocalizedData.HubResourceGraphReader_AssignFailed -f $scopeValue, $_.Exception.Message)
             }
 
-            Write-Verbose ($script:LocalizedData.HubResourceGraphReader_Assigned -f $scopeValue)
-            $assignment
+            $message = $script:LocalizedData.HubResourceGraphReader_Assigned -f $scopeValue
+            Write-Verbose $message
+            $assignmentId = if ($assignment.RoleAssignmentId) { $assignment.RoleAssignmentId } else { $assignment.Id }
+            [PSCustomObject]@{
+                Command          = 'Add-FinOpsHubResourceGraphReader'
+                HubName          = $HubName
+                DataFactoryName  = $dataFactoryName
+                PrincipalId      = $principalId
+                Scope            = $scopeValue
+                Role             = 'Reader'
+                Status           = 'Assigned'
+                Message          = $message
+                RoleAssignmentId = $assignmentId
+            }
+        }
+        else
+        {
+            $message = $script:LocalizedData.HubResourceGraphReader_Skipped -f $scopeValue
+            [PSCustomObject]@{
+                Command          = 'Add-FinOpsHubResourceGraphReader'
+                HubName          = $HubName
+                DataFactoryName  = $dataFactoryName
+                PrincipalId      = $principalId
+                Scope            = $scopeValue
+                Role             = 'Reader'
+                Status           = 'Skipped'
+                Message          = $message
+                RoleAssignmentId = $null
+            }
         }
     }
 }
