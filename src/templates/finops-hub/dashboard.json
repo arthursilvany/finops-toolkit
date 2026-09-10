@@ -3319,7 +3319,8 @@
     { "id": "8ca40660-3fbc-4a08-b12e-92e7382d9449", "queryId": "4a1973bf-08e9-4e82-b8e6-6edff81cf0a5", "variableName": "CostsByDayAHB" },
     { "id": "48ebd897-d085-490f-8b4b-9b43d4fb2efc", "queryId": "eb9259cc-05b7-4441-a66d-a29026fe371b", "variableName": "CostsPlus" },
     { "id": "d4461bd4-a159-4478-9caa-2f2581ddcf95", "queryId": "ede6c9ce-4b33-4c2e-b572-07e3361b242e", "variableName": "CostRecommendations" },
-    { "id": "8c8c31f5-2c2d-4a35-a27a-c264ac3d1c25", "queryId": "34f863cf-687f-462f-a052-1689869afec8", "variableName": "ResourceAnomalies" }
+    { "id": "8c8c31f5-2c2d-4a35-a27a-c264ac3d1c25", "queryId": "34f863cf-687f-462f-a052-1689869afec8", "variableName": "ResourceAnomalies" },
+    { "id": "f4445848-15d7-40e4-8e24-a8c08698850f", "queryId": "afb69efe-e442-4294-9ad3-5bd9356c80e0", "variableName": "IngestedExtents" }
   ],
   "parameters": [
     {
@@ -3830,51 +3831,51 @@
     },
     {
       "dataSource": { "kind": "inline", "dataSourceId": "23540be2-ffc9-4b61-8c4c-05e493e682a6" },
-      "text": ".show cluster extents\n| where TableName contains '_final_v'\n| extend Dataset = tostring(split(TableName, '_final_v')[0])\n| extend FocusVersion = replace_string(tostring(split(TableName, '_final_v')[1]), '_', '.')\n| extend ToolkitVersion = tostring(extract(@'drop-by:ftk-version-([^\\s]+)', 1, Tags))\n// | extend Table = tostring(extract(@'drop-by:([^/\\s]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\\s]+)', 1, Tags))\n| extend Date  = tostring(extract(@'drop-by:([^/\\s]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\\s]+)', 2, Tags))\n| extend Scope = tostring(extract(@'drop-by:([^/\\s]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\\s]+)', 5, Tags))\n| extend Date  = todatetime(strcat(replace_string(trim(@'/', Date), '/', '-'), '-01'))\n| extend Scope = replace_regex(Scope, @'/[^/]+$', '')\n| project Dataset, FocusVersion, ToolkitVersion, Date, Scope, LastUpdate = MaxCreatedOn, OriginalSize, RowCount\n| extend ScopeId = database('Ingestion').parse_resourceid(Scope).ResourceName\n// TODO: Look up the name from cost data\n| extend ScopeResourceType = database('Ingestion').parse_resourceid(Scope).x_ResourceType\n// TODO: Clean up scope resource type display names -- | extend ScopeType = resource_type(ScopeResourceType).SingularDisplayName\n| summarize Rows = sum(RowCount) by Date, Dataset",
+      "text": "IngestedExtents\n| summarize Rows = sum(Rows) by Date, Dataset",
       "id": "b98c9ed7-47b3-41c1-a596-fd9d32725b33",
-      "usedVariables": []
+      "usedVariables": ["IngestedExtents"]
     },
     {
       "dataSource": { "kind": "inline", "dataSourceId": "23540be2-ffc9-4b61-8c4c-05e493e682a6" },
-      "text": ".show cluster extents\n| where TableName contains '_final_v'\n| extend Dataset = tostring(split(TableName, '_final_v')[0])\n| where Dataset == 'Costs'\n| extend FocusVersion = replace_string(tostring(split(TableName, '_final_v')[1]), '_', '.')\n| extend ToolkitVersion = tostring(extract(@'drop-by:ftk-version-([^\\s]+)', 1, Tags))\n// | extend Table = tostring(extract(@'drop-by:([^/\\s]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\\s]+)', 1, Tags))\n| extend Date  = tostring(extract(@'drop-by:([^/\\s]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\\s]+)', 2, Tags))\n| extend Scope = tostring(extract(@'drop-by:([^/\\s]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\\s]+)', 5, Tags))\n| extend Date  = todatetime(strcat(replace_string(trim(@'/', Date), '/', '-'), '-01'))\n| extend Scope = replace_regex(Scope, @'/[^/]+$', '')\n| project Dataset, FocusVersion, ToolkitVersion, Date, Scope, LastUpdate = MaxCreatedOn, OriginalSize, RowCount\n| extend ScopeId = tostring(database('Ingestion').parse_resourceid(Scope).ResourceName)\n| extend ScopeResourceType = database('Ingestion').parse_resourceid(Scope).x_ResourceType\n// TODO: Clean up scope resource type display names -- | extend ScopeType = resource_type(ScopeResourceType).SingularDisplayName\n| summarize Rows = sum(RowCount) by Date, ScopeId",
+      "text": "IngestedExtents\n| where Dataset == 'Costs'\n| summarize Rows = sum(Rows) by Date, ScopeId",
       "id": "187e22fe-3d78-45a2-a2bf-090ece144fd1",
-      "usedVariables": []
+      "usedVariables": ["IngestedExtents"]
     },
     {
       "dataSource": { "kind": "inline", "dataSourceId": "23540be2-ffc9-4b61-8c4c-05e493e682a6" },
-      "text": ".show cluster extents\n| where TableName contains '_final_v'\n| extend Dataset = tostring(split(TableName, '_final_v')[0])\n| where Dataset == 'Costs'\n| extend FocusVersion = replace_string(tostring(split(TableName, '_final_v')[1]), '_', '.')\n| extend ToolkitVersion = tostring(extract(@'drop-by:ftk-version-([^\\s]+)', 1, Tags))\n// | extend Table = tostring(extract(@'drop-by:([^/\\s]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\\s]+)', 1, Tags))\n| extend Date  = tostring(extract(@'drop-by:([^/\\s]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\\s]+)', 2, Tags))\n| extend Scope = tostring(extract(@'drop-by:([^/\\s]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\\s]+)', 5, Tags))\n| extend Date  = todatetime(strcat(replace_string(trim(@'/', Date), '/', '-'), '-01'))\n| extend Scope = replace_regex(Scope, @'/[^/]+$', '')\n| project Dataset, FocusVersion, ToolkitVersion, Date, Scope, LastUpdate = MaxCreatedOn, OriginalSize, RowCount\n| extend ScopeId = tostring(database('Ingestion').parse_resourceid(Scope).ResourceName)\n// TODO: Look up the name from cost data\n| extend ScopeResourceType = database('Ingestion').parse_resourceid(Scope).x_ResourceType\n// TODO: Clean up scope resource type display names -- | extend ScopeType = resource_type(ScopeResourceType).SingularDisplayName\n| summarize dcount(Scope)",
+      "text": "IngestedExtents\n| where Dataset == 'Costs'\n| summarize dcount(Scope)",
       "id": "d2c522dc-ef4b-4714-a473-09350e275557",
-      "usedVariables": []
+      "usedVariables": ["IngestedExtents"]
     },
     {
       "dataSource": { "kind": "inline", "dataSourceId": "23540be2-ffc9-4b61-8c4c-05e493e682a6" },
-      "text": ".show cluster extents\n| where TableName contains '_final_v'\n| extend Dataset = tostring(split(TableName, '_final_v')[0])\n| where Dataset == 'Costs'\n| extend FocusVersion = replace_string(tostring(split(TableName, '_final_v')[1]), '_', '.')\n| extend ToolkitVersion = tostring(extract(@'drop-by:ftk-version-([^\\s]+)', 1, Tags))\n// | extend Table = tostring(extract(@'drop-by:([^/\\s]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\\s]+)', 1, Tags))\n| extend Date  = tostring(extract(@'drop-by:([^/\\s]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\\s]+)', 2, Tags))\n| extend Scope = tostring(extract(@'drop-by:([^/\\s]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\\s]+)', 5, Tags))\n| extend Date  = todatetime(strcat(replace_string(trim(@'/', Date), '/', '-'), '-01'))\n| extend Scope = replace_regex(Scope, @'/[^/]+$', '')\n| project Dataset, FocusVersion, ToolkitVersion, Date, Scope, LastUpdate = MaxCreatedOn, OriginalSize, RowCount\n| extend ScopeId = tostring(database('Ingestion').parse_resourceid(Scope).ResourceName)\n// TODO: Look up the name from cost data\n| extend ScopeResourceType = database('Ingestion').parse_resourceid(Scope).x_ResourceType\n// TODO: Clean up scope resource type display names -- | extend ScopeType = resource_type(ScopeResourceType).SingularDisplayName\n| summarize dcount(startofmonth(Date))",
+      "text": "IngestedExtents\n| where Dataset == 'Costs'\n| summarize dcount(startofmonth(Date))",
       "id": "6fe11b78-82ef-4e9a-8411-a65e5b0d8bba",
-      "usedVariables": []
+      "usedVariables": ["IngestedExtents"]
     },
     {
       "dataSource": { "kind": "inline", "dataSourceId": "23540be2-ffc9-4b61-8c4c-05e493e682a6" },
-      "text": ".show cluster extents\n| where TableName contains '_final_v'\n| extend Dataset = tostring(split(TableName, '_final_v')[0])\n| where Dataset == 'Prices'\n| extend FocusVersion = replace_string(tostring(split(TableName, '_final_v')[1]), '_', '.')\n| extend ToolkitVersion = tostring(extract(@'drop-by:ftk-version-([^\\s]+)', 1, Tags))\n// | extend Table = tostring(extract(@'drop-by:([^/\\s]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\\s]+)', 1, Tags))\n| extend Date  = tostring(extract(@'drop-by:([^/\\s]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\\s]+)', 2, Tags))\n| extend Scope = tostring(extract(@'drop-by:([^/\\s]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\\s]+)', 5, Tags))\n| extend Date  = todatetime(strcat(replace_string(trim(@'/', Date), '/', '-'), '-01'))\n| extend Scope = replace_regex(Scope, @'/[^/]+$', '')\n| project Dataset, FocusVersion, ToolkitVersion, Date, Scope, LastUpdate = MaxCreatedOn, OriginalSize, RowCount\n| extend ScopeId = tostring(database('Ingestion').parse_resourceid(Scope).ResourceName)\n// TODO: Look up the name from cost data\n| extend ScopeResourceType = database('Ingestion').parse_resourceid(Scope).x_ResourceType\n// TODO: Clean up scope resource type display names -- | extend ScopeType = resource_type(ScopeResourceType).SingularDisplayName\n| summarize Rows = sum(RowCount) by Date, ScopeId",
+      "text": "IngestedExtents\n| where Dataset == 'Prices'\n| summarize Rows = sum(Rows) by Date, ScopeId",
       "id": "b3621977-59be-4f98-a034-a94479612115",
-      "usedVariables": []
+      "usedVariables": ["IngestedExtents"]
     },
     {
       "dataSource": { "kind": "inline", "dataSourceId": "23540be2-ffc9-4b61-8c4c-05e493e682a6" },
-      "text": ".show cluster extents\n| where TableName contains '_final_v'\n| extend Dataset = tostring(split(TableName, '_final_v')[0])\n| where Dataset == 'Recommendations'\n| extend FocusVersion = replace_string(tostring(split(TableName, '_final_v')[1]), '_', '.')\n| extend ToolkitVersion = tostring(extract(@'drop-by:ftk-version-([^\\s]+)', 1, Tags))\n// | extend Table = tostring(extract(@'drop-by:([^/\\s]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\\s]+)', 1, Tags))\n| extend Date  = tostring(extract(@'drop-by:([^/\\s]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\\s]+)', 2, Tags))\n| extend Scope = tostring(extract(@'drop-by:([^/\\s]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\\s]+)', 5, Tags))\n| extend Date  = todatetime(strcat(replace_string(trim(@'/', Date), '/', '-'), '-01'))\n| extend Scope = replace_regex(Scope, @'/[^/]+$', '')\n| project Dataset, FocusVersion, ToolkitVersion, Date, Scope, LastUpdate = MaxCreatedOn, OriginalSize, RowCount\n| extend ScopeId = tostring(database('Ingestion').parse_resourceid(Scope).ResourceName)\n// TODO: Look up the name from cost data\n| extend ScopeResourceType = database('Ingestion').parse_resourceid(Scope).x_ResourceType\n// TODO: Clean up scope resource type display names -- | extend ScopeType = resource_type(ScopeResourceType).SingularDisplayName\n| summarize Rows = sum(RowCount) by Date, ScopeId",
+      "text": "IngestedExtents\n| where Dataset == 'Recommendations'\n| summarize Rows = sum(Rows) by Date, ScopeId",
       "id": "4a2a77fe-e819-4059-b027-dab0a1770a0a",
-      "usedVariables": []
+      "usedVariables": ["IngestedExtents"]
     },
     {
       "dataSource": { "kind": "inline", "dataSourceId": "23540be2-ffc9-4b61-8c4c-05e493e682a6" },
-      "text": ".show cluster extents\n| where TableName contains '_final_v'\n| extend Dataset = tostring(split(TableName, '_final_v')[0])\n| where Dataset == 'Transactions'\n| extend FocusVersion = replace_string(tostring(split(TableName, '_final_v')[1]), '_', '.')\n| extend ToolkitVersion = tostring(extract(@'drop-by:ftk-version-([^\\s]+)', 1, Tags))\n// | extend Table = tostring(extract(@'drop-by:([^/\\s]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\\s]+)', 1, Tags))\n| extend Date  = tostring(extract(@'drop-by:([^/\\s]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\\s]+)', 2, Tags))\n| extend Scope = tostring(extract(@'drop-by:([^/\\s]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\\s]+)', 5, Tags))\n| extend Date  = todatetime(strcat(replace_string(trim(@'/', Date), '/', '-'), '-01'))\n| extend Scope = replace_regex(Scope, @'/[^/]+$', '')\n| project Dataset, FocusVersion, ToolkitVersion, Date, Scope, LastUpdate = MaxCreatedOn, OriginalSize, RowCount\n| extend ScopeId = tostring(database('Ingestion').parse_resourceid(Scope).ResourceName)\n// TODO: Look up the name from cost data\n| extend ScopeResourceType = database('Ingestion').parse_resourceid(Scope).x_ResourceType\n// TODO: Clean up scope resource type display names -- | extend ScopeType = resource_type(ScopeResourceType).SingularDisplayName\n| summarize Rows = sum(RowCount) by Date, ScopeId",
+      "text": "IngestedExtents\n| where Dataset == 'Transactions'\n| summarize Rows = sum(Rows) by Date, ScopeId",
       "id": "8f1ad1ef-6f5e-4f20-a1c4-3941e871d0cd",
-      "usedVariables": []
+      "usedVariables": ["IngestedExtents"]
     },
     {
       "dataSource": { "kind": "inline", "dataSourceId": "23540be2-ffc9-4b61-8c4c-05e493e682a6" },
-      "text": ".show cluster extents\n| where TableName contains '_final_v'\n| extend Dataset = tostring(split(TableName, '_final_v')[0])\n| where Dataset == 'CommitmentDiscountUsage'\n| extend FocusVersion = replace_string(tostring(split(TableName, '_final_v')[1]), '_', '.')\n| extend ToolkitVersion = tostring(extract(@'drop-by:ftk-version-([^\\s]+)', 1, Tags))\n// | extend Table = tostring(extract(@'drop-by:([^/\\s]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\\s]+)', 1, Tags))\n| extend Date  = tostring(extract(@'drop-by:([^/\\s]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\\s]+)', 2, Tags))\n| extend Scope = tostring(extract(@'drop-by:([^/\\s]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\\s]+)', 5, Tags))\n| extend Date  = todatetime(strcat(replace_string(trim(@'/', Date), '/', '-'), '-01'))\n| extend Scope = replace_regex(Scope, @'/[^/]+$', '')\n| project Dataset, FocusVersion, ToolkitVersion, Date, Scope, LastUpdate = MaxCreatedOn, OriginalSize, RowCount\n| extend ScopeId = tostring(database('Ingestion').parse_resourceid(Scope).ResourceName)\n// TODO: Look up the name from cost data\n| extend ScopeResourceType = database('Ingestion').parse_resourceid(Scope).x_ResourceType\n// TODO: Clean up scope resource type display names -- | extend ScopeType = resource_type(ScopeResourceType).SingularDisplayName\n| summarize Rows = sum(RowCount) by Date, ScopeId",
+      "text": "IngestedExtents\n| where Dataset == 'CommitmentDiscountUsage'\n| summarize Rows = sum(Rows) by Date, ScopeId",
       "id": "e9a9a135-6a74-4463-b69f-eac6930ff1f2",
-      "usedVariables": []
+      "usedVariables": ["IngestedExtents"]
     },
     {
       "dataSource": { "kind": "inline", "dataSourceId": "23540be2-ffc9-4b61-8c4c-05e493e682a6" },
@@ -3990,6 +3991,12 @@
       "text": "let months = toscalar(database('Ingestion').HubSettings | project toint(retention.final.months));\nlet providers = Costs_v1_2\n    | where ChargePeriodStart >= monthsago(iff(isempty(months), 24, months))\n    | where isnotempty(ProviderName)\n    | distinct ProviderName;\nproviders\n| extend Label = case(\n    ProviderName =~ 'Microsoft', 'Azure',\n    ProviderName =~ 'AWS', 'AWS',\n    ProviderName =~ 'GCP', 'Google Cloud',\n    ProviderName\n), _Order = 1\n| union (\n    print ProviderName = '', Label = 'All', _Order = 0\n)\n| order by _Order asc, Label asc\n| project ProviderName, Label\n",
       "id": "9a0f7745-f22f-4c95-9468-ea05fc025ddb",
       "usedVariables": []
+    },
+    {
+      "dataSource": { "kind": "inline", "dataSourceId": "23540be2-ffc9-4b61-8c4c-05e493e682a6" },
+      "text": "// Ingested extent metadata, used by the data ingestion page.\n//\n// This intentionally does not use \".show cluster extents\". Azure Data Explorer injects dashboard\n// parameters as let statements, and a let statement cannot precede a management command, so a\n// .show based tile can never be filtered by the Cloud provider parameter. Reading extent_tags()\n// from a regular query returns the same drop-by tags and does accept parameters.\nunion withsource = SourceTable database('Ingestion').*_final_v*\n| extend Tags = tostring(extent_tags())\n| summarize Rows = count() by SourceTable, Tags\n| extend Dataset = tostring(extract(@'([A-Za-z]+)_final_v', 1, SourceTable))\n| extend FocusVersion = replace_string(tostring(split(SourceTable, '_final_v')[1]), '_', '.')\n| extend ToolkitVersion = tostring(extract(@'drop-by:ftk-version-([^\"]+)', 1, Tags))\n//\n// The drop-by path tag carries the ingestion folder, which is the only place the source scope is\n// recorded. Tags is a JSON array here, so the character classes stop at a quote instead of a space.\n| extend Date = tostring(extract(@'drop-by:([^/\"]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\"]+)', 2, Tags))\n| extend Scope = tostring(extract(@'drop-by:([^/\"]+)(/[0-9]{4}(/[0-9]{2}(/[0-9]{2})?)?)?(/[^\"]+)', 5, Tags))\n| extend Date = todatetime(strcat(replace_string(trim(@'/', Date), '/', '-'), '-01'))\n| extend Scope = replace_regex(Scope, @'/[^/]+$', '')\n| extend ScopeId = tostring(database('Ingestion').parse_resourceid(Scope).ResourceName)\n//\n// Non-Azure scopes, like AWS accounts, aren't resource IDs, so fall back to the last path segment\n// to avoid a blank series label.\n| extend ScopeId = iff(isempty(ScopeId), tostring(extract(@'([^/]+)$', 1, Scope)), ScopeId)\n//\n// The ingestion path root identifies the provider: AWS exports land under /AWS/<account>, while\n// Microsoft data lands under /subscriptions, /providers, or /tenants.\n| extend x_ExtentProvider = case(\n    tostring(split(Scope, '/')[1]) =~ 'AWS', 'AWS',\n    tostring(split(Scope, '/')[1]) =~ 'GCP', 'GCP',\n    'Microsoft'\n)\n| where isempty(selectedCloudProvider) or x_ExtentProvider =~ selectedCloudProvider\n| project Dataset, FocusVersion, ToolkitVersion, Date, Scope, ScopeId, x_ExtentProvider, Rows",
+      "id": "afb69efe-e442-4294-9ad3-5bd9356c80e0",
+      "usedVariables": ["selectedCloudProvider"]
     }
   ,
     {
