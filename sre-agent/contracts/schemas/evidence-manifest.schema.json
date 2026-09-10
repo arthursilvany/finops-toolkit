@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentic-finops:v2:evidence-manifest",
+  "title": "Agentic FinOps Evidence Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "manifest_id", "execution_id", "scope_hash", "created_at_utc", "evidence"],
+  "properties": {
+    "schema_version": { "const": "2.0" },
+    "manifest_id": { "type": "string", "minLength": 1 },
+    "execution_id": { "type": "string", "minLength": 1 },
+    "scope_hash": { "$ref": "#/$defs/sha256" },
+    "created_at_utc": { "type": "string", "format": "date-time" },
+    "evidence": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/evidenceItem" }
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+    "nullableString": { "type": ["string", "null"] },
+    "evidenceItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence_id", "classification", "tool_name", "tool_run_id",
+        "observed_at_utc", "identity", "source", "query", "parameters",
+        "period", "schema", "row_count", "result_hash", "transformations",
+        "freshness", "data_classification"
+      ],
+      "properties": {
+        "evidence_id": { "type": "string", "minLength": 1 },
+        "classification": { "enum": ["OBSERVED", "DERIVED", "INFERRED", "RECOMMENDED"] },
+        "tool_name": { "type": "string", "minLength": 1 },
+        "tool_run_id": { "type": "string", "minLength": 1 },
+        "observed_at_utc": { "type": "string", "format": "date-time" },
+        "identity": { "type": "string", "minLength": 1 },
+        "source": { "type": "string", "minLength": 1 },
+        "query": {
+          "type": "object", "additionalProperties": false,
+          "required": ["text", "hash", "state"],
+          "properties": {
+            "text": { "$ref": "#/$defs/nullableString" },
+            "hash": {
+              "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }]
+            },
+            "state": {
+              "enum": ["NA", "DISCOVERED", "STATICALLY_VALIDATED", "SCHEMA_VALIDATED", "EXECUTED"]
+            }
+          }
+        },
+        "parameters": { "type": "object" },
+        "period": {
+          "type": "object", "additionalProperties": false,
+          "required": ["start_utc", "end_utc"],
+          "properties": {
+            "start_utc": { "type": "string", "format": "date-time" },
+            "end_utc": { "type": "string", "format": "date-time" }
+          }
+        },
+        "schema": { "type": ["object", "null"] },
+        "row_count": { "type": ["integer", "null"], "minimum": 0 },
+        "result_hash": {
+          "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }]
+        },
+        "transformations": {
+          "type": "array", "items": { "type": "string" }
+        },
+        "freshness": {
+          "type": "object", "additionalProperties": false,
+          "required": ["as_of_utc", "status"],
+          "properties": {
+            "as_of_utc": { "type": ["string", "null"], "format": "date-time" },
+            "status": { "enum": ["FRESH", "STALE", "UNKNOWN", "NA"] }
+          }
+        },
+        "data_classification": {
+          "enum": ["PUBLIC", "INTERNAL", "CONFIDENTIAL", "HIGHLY_CONFIDENTIAL"]
+        }
+      }
+    }
+  }
+}
